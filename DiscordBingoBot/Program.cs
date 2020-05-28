@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBingoBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +45,7 @@ namespace DiscordBingoBot
             .AddSingleton(_config)
             .AddSingleton(_commandService)
             .AddSingleton<CommandHandler>()
+            .AddSingleton<IBingoService,BingoService>()
             .BuildServiceProvider();
 
         private Task Log(LogMessage msg)
