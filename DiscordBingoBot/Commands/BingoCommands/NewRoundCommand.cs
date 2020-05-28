@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -27,6 +28,31 @@ namespace DiscordBingoBot.Commands.BingoCommands
         [Summary("Starts a new round in the active bingo game")]
         public async Task NewRound()
         {
+            await ExecuteNewRound();
+        }
+
+        [Command("newRound")]
+        [Summary("Starts a new round in the active bingo game")]
+        public async Task NewRoundVerbose(
+            [Summary("Mode (verbose|silent)")]string mode)
+        {
+            switch (mode)
+            {
+                case "verbose":
+                    await ExecuteNewRound(true);
+                    return;
+                case "silent":
+                    await ExecuteNewRound(false);
+                    return;
+                default:
+                    await Context.Guild.GetUser(Context.User.Id)
+                        .SendMessageAsync("Invalid parameters in command (" + Context.Message.Content + ")");
+                    return;
+            }
+        }
+
+        private async Task ExecuteNewRound(bool verbose = true)
+        {
             if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
             {
                 return;
@@ -34,7 +60,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             var message = Context.Message;
 
-            var result = _bingoService.StartRound();
+            var result = _bingoService.StartRound(verbose);
             if (result.Result)
             {
                 await ReplyAsync("A new round is starting with " + result.Info.NumberOfWinConditions + " win conditions");
@@ -55,7 +81,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
                         stringBuilder.AppendLine("Row" + (index + 1) + ": " +
                                                  string.Join(" | ", player.Grid.Rows[index].Items));
                     }
-                    
+
                     await playerSocket.SendMessageAsync(stringBuilder.ToString());
                 }
 

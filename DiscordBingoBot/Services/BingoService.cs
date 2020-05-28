@@ -30,6 +30,8 @@ namespace DiscordBingoBot.Services
         private int _winners = 0;
         public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
+        public bool Verbose { get; private set; }
+
         public Outcome<string> Start()
         {
             if (_isActive)
@@ -65,8 +67,9 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success();
         }
 
-        public Outcome<StartRoundOutcome> StartRound()
+        public Outcome<StartRoundOutcome> StartRound(bool verbose)
         {
+            Verbose = verbose;
             if (_isActive == false)
             {
                 return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome{Error = "No active game found"});

@@ -32,7 +32,16 @@ namespace DiscordBingoBot.Commands.BingoCommands
             var next = _bingoService.NextItem();
             if (next.Result)
             {
-                await ReplyAsync("And the next one is " + next.Info);
+                var reply = "And the next one is " + next.Info;
+                if (_bingoService.Verbose)
+                {
+                    await ReplyAsync(reply);
+                }
+                else
+                {
+                    await Context.User.SendMessageAsync(reply);
+                }
+                
             }
             else
             {
