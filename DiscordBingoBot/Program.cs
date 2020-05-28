@@ -56,7 +56,8 @@ namespace DiscordBingoBot
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appSettings.json", optional: true, reloadOnChange: true);
+                .AddJsonFile("appSettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appSettings.json.secret", optional: false, reloadOnChange: true);
             return builder.Build();
         }
 
