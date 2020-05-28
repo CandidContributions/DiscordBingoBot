@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
 using DiscordBingoBot.Services;
 
@@ -7,29 +6,30 @@ namespace DiscordBingoBot.Commands.BingoCommands
 {
     // Keep in mind your module **must** be public and inherit ModuleBase.
     // If it isn't, it will not be discovered by AddModulesAsync!
-    public class StartCommand : ModuleBase<SocketCommandContext>
+    public class JoinCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
 
-        public StartCommand(IBingoService bingoService)
+        public JoinCommand(IBingoService bingoService)
         {
             _bingoService = bingoService;
         }
 
-        [Command("start")]
-        [Summary("Starts a new bingo game")]
-        public async Task Start()
+        [Command("join")]
+        [Summary("Joins the active bingo game")]
+        public async Task Join()
         {
             var message = Context.Message;
 
-            var result = _bingoService.Start();
+            var result = _bingoService.Register(Context.User.Mention);
             if (result.Result)
             {
-                await ReplyAsync("Bingo game started by " + Context.User.Mention);
+
+                await ReplyAsync(Context.User.Mention + " has joined the Bingo game");
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't start a bingo game: " + result.Reason);
+                await ReplyAsync(Context.User.Mention + " can't join the Bingo game: " + result.Reason);
             }
 
             await message.DeleteAsync();

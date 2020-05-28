@@ -7,29 +7,29 @@ namespace DiscordBingoBot.Commands.BingoCommands
 {
     // Keep in mind your module **must** be public and inherit ModuleBase.
     // If it isn't, it will not be discovered by AddModulesAsync!
-    public class StartCommand : ModuleBase<SocketCommandContext>
+    public class NextCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
 
-        public StartCommand(IBingoService bingoService)
+        public NextCommand(IBingoService bingoService)
         {
             _bingoService = bingoService;
         }
 
-        [Command("start")]
-        [Summary("Starts a new bingo game")]
-        public async Task Start()
+        [Command("next")]
+        [Summary("Calls the next item in a bingo round")]
+        public async Task Next()
         {
             var message = Context.Message;
 
-            var result = _bingoService.Start();
-            if (result.Result)
+            var next = _bingoService.NextItem();
+            if (next.Result)
             {
-                await ReplyAsync("Bingo game started by " + Context.User.Mention);
+                await ReplyAsync("And the next one is " + next.Reason);
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't start a bingo game: " + result.Reason);
+                await Context.User.SendMessageAsync("Can't call a new item: " + next.Reason);
             }
 
             await message.DeleteAsync();

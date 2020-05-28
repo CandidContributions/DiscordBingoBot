@@ -24,6 +24,11 @@ namespace DiscordBingoBot.Core
             return new Outcome<TReason>(true, default);
         }
 
+        public static Outcome<TReason> Success(TReason value)
+        {
+            return new Outcome<TReason>(true, value);
+        }
+
         public static Outcome<TReason> Fail(TReason reason)
         {
             return new Outcome<TReason>(false, reason);

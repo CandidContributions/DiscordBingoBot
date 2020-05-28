@@ -17,6 +17,7 @@ namespace DiscordBingoBot
         private IConfigurationRoot _config;
         private CommandHandler _commandHandler;
         private CommandService _commandService;
+        private ILogger _logger;
 
 
         public static void Main(string[] args)
@@ -26,10 +27,11 @@ namespace DiscordBingoBot
         {
             _config = GetConfig();
             _client = new DiscordSocketClient();
-            _client.Log += Log;
+            _logger = new Logger();
+            _client.Log += _logger.Log;
             _commandService = new CommandService();
 
-            _commandHandler = new CommandHandler(BuildServiceProvider(), _client, new CommandService(), _config);
+            _commandHandler = new CommandHandler(BuildServiceProvider(_logger), _client, new CommandService(), _config);
             await _commandHandler.InstallCommandsAsync();
 
             await _client.LoginAsync(TokenType.Bot, _config["DiscordBotToken"]);
@@ -40,19 +42,15 @@ namespace DiscordBingoBot
             await Task.Delay(-1);
         }
 
-        public IServiceProvider BuildServiceProvider() => new ServiceCollection()
+        public IServiceProvider BuildServiceProvider(ILogger logger) => new ServiceCollection()
             .AddSingleton(_client)
             .AddSingleton(_config)
             .AddSingleton(_commandService)
             .AddSingleton<CommandHandler>()
             .AddSingleton<IBingoService,BingoService>()
+            .AddSingleton<ICsvReader,CsvReader>()
+            .AddSingleton(logger)
             .BuildServiceProvider();
-
-        private Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
-        }
 
         private IConfigurationRoot GetConfig()
         {
