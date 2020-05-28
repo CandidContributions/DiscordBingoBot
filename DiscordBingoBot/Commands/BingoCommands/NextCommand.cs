@@ -10,16 +10,23 @@ namespace DiscordBingoBot.Commands.BingoCommands
     public class NextCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
+        private readonly IPermissionHandler _permissionHandler;
 
-        public NextCommand(IBingoService bingoService)
+        public NextCommand(IBingoService bingoService, IPermissionHandler permissionHandler)
         {
             _bingoService = bingoService;
+            _permissionHandler = permissionHandler;
         }
 
         [Command("next")]
         [Summary("Calls the next item in a bingo round")]
         public async Task Next()
         {
+            if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
+            {
+                return;
+            }
+
             var message = Context.Message;
 
             var next = _bingoService.NextItem();

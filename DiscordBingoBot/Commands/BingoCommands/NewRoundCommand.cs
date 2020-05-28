@@ -13,17 +13,25 @@ namespace DiscordBingoBot.Commands.BingoCommands
     {
         private readonly IBingoService _bingoService;
         private readonly ILogger _logger;
+        private readonly IPermissionHandler _permissionHandler;
 
-        public NewRoundCommand(IBingoService bingoService, ILogger logger)
+        public NewRoundCommand(IBingoService bingoService, ILogger logger,
+            IPermissionHandler permissionHandler)
         {
             _bingoService = bingoService;
             _logger = logger;
+            _permissionHandler = permissionHandler;
         }
 
         [Command("newRound")]
         [Summary("Starts a new round in the active bingo game")]
         public async Task NewRound()
         {
+            if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
+            {
+                return;
+            }
+
             var message = Context.Message;
 
             var result = _bingoService.StartRound();

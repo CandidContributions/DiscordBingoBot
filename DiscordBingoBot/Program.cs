@@ -56,6 +56,7 @@ namespace DiscordBingoBot
             .AddSingleton<IBingoService,BingoService>()
             .AddSingleton<ICsvReader,CsvReader>()
             .AddSingleton(logger)
+            .AddSingleton<IPermissionHandler,PermissionHandler>()
             .BuildServiceProvider();
 
         private IConfigurationRoot GetConfig()

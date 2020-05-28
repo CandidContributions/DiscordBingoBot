@@ -10,16 +10,23 @@ namespace DiscordBingoBot.Commands.BingoCommands
     public class StopCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
+        private readonly IPermissionHandler _permissionHandler;
 
-        public StopCommand(IBingoService bingoService)
+        public StopCommand(IBingoService bingoService, IPermissionHandler permissionHandler)
         {
             _bingoService = bingoService;
+            _permissionHandler = permissionHandler;
         }
 
         [Command("stop")]
         [Summary("Stops the active bingo game")]
         public async Task Stop()
         {
+            if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
+            {
+                return;
+            }
+
             var message = Context.Message;
 
             var result = _bingoService.Stop();

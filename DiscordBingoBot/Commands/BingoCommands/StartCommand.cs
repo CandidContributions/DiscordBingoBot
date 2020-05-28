@@ -14,19 +14,27 @@ namespace DiscordBingoBot.Commands.BingoCommands
         private readonly IBingoService _bingoService;
         private readonly CommandService _commandService;
         private readonly IConfigurationRoot _configuration;
+        private readonly IPermissionHandler _permissionHandler;
 
         public StartCommand(IBingoService bingoService, CommandService commandService,
-            IConfigurationRoot configuration)
+            IConfigurationRoot configuration, IPermissionHandler permissionHandler)
         {
             _bingoService = bingoService;
             _commandService = commandService;
             _configuration = configuration;
+            _permissionHandler = permissionHandler;
         }
 
         [Command("start")]
         [Summary("Starts a new bingo game")]
+        [RequireUserPermission(GuildPermission.Connect, Group = "test", ErrorMessage = "Failed test")]
         public async Task Start()
         {
+            if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
+            {
+                return;
+            }
+
             var message = Context.Message;
 
             var result = _bingoService.Start();
