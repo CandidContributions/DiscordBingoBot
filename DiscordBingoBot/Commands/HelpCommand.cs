@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using ApexDiscord.Bot.Attributes;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Attributes;
 using Microsoft.Extensions.Configuration;
 
 namespace DiscordBingoBot.Commands

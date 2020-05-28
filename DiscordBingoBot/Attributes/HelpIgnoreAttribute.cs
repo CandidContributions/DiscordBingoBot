@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ApexDiscord.Bot.Attributes
+namespace DiscordBingoBot.Attributes
 {
     /// <summary>
     /// Used to exlude commands from the help menu

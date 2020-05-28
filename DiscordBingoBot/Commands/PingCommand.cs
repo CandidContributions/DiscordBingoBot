@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using ApexDiscord.Bot.Attributes;
 using Discord.Commands;
+using DiscordBingoBot.Attributes;
 
 namespace ApexDiscord.Bot.Commands
 {
