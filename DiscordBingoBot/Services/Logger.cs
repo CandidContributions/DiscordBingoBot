@@ -19,5 +19,11 @@ namespace DiscordBingoBot.Services
             Console.WriteLine("[Info] "+msg);
             return Task.CompletedTask;
         }
+
+        public Task Warn(string msg)
+        {
+            Console.WriteLine("[Warning] " + msg);
+            return Task.CompletedTask;
+        }
     }
 }

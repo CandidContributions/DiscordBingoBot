@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using DiscordBingoBot.Core;
+using DiscordBingoBot.Extenstions;
 using DiscordBingoBot.Models;
 
 namespace DiscordBingoBot.Services
@@ -10,16 +11,20 @@ namespace DiscordBingoBot.Services
     public class BingoService : IBingoService
     {
         private readonly ICsvReader _csvReader;
+        private readonly ILogger _logger;
 
-        public BingoService(ICsvReader csvReader)
+        public BingoService(ICsvReader csvReader, ILogger logger)
         {
             _csvReader = csvReader;
+            _logger = logger;
         }
 
         private bool _isActive;
         private bool _roundActive;
         private List<string> _items;
         private List<Player> _players;
+        private List<string> _roundItems;
+        public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
         public Outcome<string> Start()
         {
@@ -72,10 +77,8 @@ namespace DiscordBingoBot.Services
                 return Outcome<string>.Fail("Need at least 2 players to play");
             }
 
+            RoundReset();
             _roundActive = true;
-            // todo give every player a new card
-
-
             return Outcome<string>.Success();
         }
 
@@ -90,13 +93,29 @@ namespace DiscordBingoBot.Services
                 return Outcome<string>.Fail("No active round");
             }
             // todo pick and item and move the tracker
-            // todo mark all matching items on player cards
-            return Outcome<string>.Success("Todo: pass the item");
+            var item = _roundItems.FirstOrDefault();
+            if (item == null)
+            {
+                return Outcome<string>.Fail("No items remaining, everyone must be asleep");
+            }
+            _roundItems.RemoveAt(0);
+            MarkItemOnPlayerCards(item);
+            return Outcome<string>.Success(item);
         }
 
-        public Outcome<string> CheckBingo()
+        public Outcome<string> CheckBingo(string playerName)
         {
-            return Outcome<string>.Fail("Not implemented");
+            var player = _players.FirstOrDefault(p => p.Name == playerName);
+            if (player == null)
+            {
+                return Outcome<string>.Fail("You are not registered");
+            }
+
+            if (GetPlayerGrid(playerName).IsFullyMarked())
+            {
+                return Outcome<string>.Success();
+            }
+            return Outcome<string>.Fail("Liar liar, pants on fire!");
         }
 
         public Outcome<string> Stop()
@@ -111,6 +130,11 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success();
         }
 
+        public Grid GetPlayerGrid(string playerName)
+        {
+            return _players.First(p => p.Name == playerName).Grid;
+        }
+
         private void GameReset()
         {
             _isActive = true;
@@ -121,8 +145,30 @@ namespace DiscordBingoBot.Services
 
         private void RoundReset()
         {
-            // todo randomize the item pool
-            // todo reset the item pool tracker
+            AssingGridsToPlayers();
+
+            // randomize the pool
+            _roundItems = new List<string>(_items);
+            var roundGuid = Guid.NewGuid();
+            var random = RandomFactory.FromGuid(roundGuid);
+            _roundItems.Shuffle(random);
+        }
+
+        private void AssingGridsToPlayers()
+        {
+            foreach (var player in _players)
+            {
+                player.Grid = new Grid(Guid.NewGuid());
+                player.Grid.Populate(_items);
+            }
+        }
+
+        private void MarkItemOnPlayerCards(string item)
+        {
+            foreach (var player in _players)
+            {
+                player.Grid.Mark(item);
+            }
         }
     }
 }

@@ -7,5 +7,6 @@ namespace DiscordBingoBot.Services
     {
         Task Log(LogMessage msg);
         Task Info(string msg);
+        Task Warn(string msg);
     }
 }

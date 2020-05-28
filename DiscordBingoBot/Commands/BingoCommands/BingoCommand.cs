@@ -22,7 +22,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = _bingoService.CheckBingo();
+            var result = _bingoService.CheckBingo(Context.User.Mention);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " is a winner!");
