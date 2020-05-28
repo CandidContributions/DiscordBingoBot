@@ -9,7 +9,7 @@ namespace DiscordBingoBot.Services
     {
         Outcome<string> Start();
         Outcome<string> Register(string playerName);
-        Outcome<string> StartRound();
+        Outcome<StartRoundOutcome> StartRound();
         Outcome<string> NextItem();
         Outcome<CheckBingoOutcome> CheckBingo(string playerName);
         Outcome<string> Stop();

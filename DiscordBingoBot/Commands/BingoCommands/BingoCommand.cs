@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using DiscordBingoBot.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace DiscordBingoBot.Commands.BingoCommands
 {
@@ -10,10 +12,14 @@ namespace DiscordBingoBot.Commands.BingoCommands
     public class BingoCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
+        private readonly CommandService _commandService;
+        private readonly IConfigurationRoot _configuration;
 
-        public BingoCommand(IBingoService bingoService)
+        public BingoCommand(IBingoService bingoService, CommandService commandService, IConfigurationRoot configuration)
         {
             _bingoService = bingoService;
+            _commandService = commandService;
+            _configuration = configuration;
         }
 
         [Command("bingo")]
@@ -34,12 +40,13 @@ namespace DiscordBingoBot.Commands.BingoCommands
                 }
                 else
                 {
-                    await ReplyAsync("That concludes this round, registrations are open again");
+                    var joinCommand = _commandService.Commands.First(c => c.Name == "join");
+                    await ReplyAsync("That concludes this round, registrations are open again type "+ _configuration["DiscordBotPrefix"] + joinCommand.Name);
                 }
             }
             else
             {
-                await Context.User.SendMessageAsync("Invalid bingo call: " + result.Info);
+                await Context.User.SendMessageAsync("Invalid bingo call: " + result.Info.Error);
             }
 
             await message.DeleteAsync();

@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using DiscordBingoBot.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace DiscordBingoBot.Commands.BingoCommands
 {
@@ -10,10 +12,15 @@ namespace DiscordBingoBot.Commands.BingoCommands
     public class StartCommand : ModuleBase<SocketCommandContext>
     {
         private readonly IBingoService _bingoService;
+        private readonly CommandService _commandService;
+        private readonly IConfigurationRoot _configuration;
 
-        public StartCommand(IBingoService bingoService)
+        public StartCommand(IBingoService bingoService, CommandService commandService,
+            IConfigurationRoot configuration)
         {
             _bingoService = bingoService;
+            _commandService = commandService;
+            _configuration = configuration;
         }
 
         [Command("start")]
@@ -26,6 +33,8 @@ namespace DiscordBingoBot.Commands.BingoCommands
             if (result.Result)
             {
                 await ReplyAsync("Bingo game started by " + Context.User.Mention);
+                var joinCommand = _commandService.Commands.First(c => c.Name == "join");
+                await ReplyAsync("You can join the game by typing " + _configuration["DiscordBotPrefix"] + joinCommand.Name);
             }
             else
             {

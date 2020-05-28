@@ -22,16 +22,24 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
         [Command("newRound")]
         [Summary("Starts a new round in the active bingo game")]
-        public async Task Start()
+        public async Task NewRound()
         {
             var message = Context.Message;
 
             var result = _bingoService.StartRound();
             if (result.Result)
             {
-                await ReplyAsync("A new round is starting, handing out new cards");
+                await ReplyAsync("A new round is starting with " + result.Info.NumberOfWinConditions + " win conditions");
+                await ReplyAsync("Handing out new cards");
                 foreach (var player in _bingoService.Players)
                 {
+                    var playerSocket = Context.Guild.Users.FirstOrDefault(u => u.Mention == player.Name);
+                    if (playerSocket == null)
+                    {
+                        await _logger.Warn("Player " + player.Name + " no longer exists");
+                        continue;
+                    }
+
                     var stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine("Your new card: " + player.Grid.GridId);
                     for (var index = 0; index < player.Grid.Rows.Length; index++)
@@ -39,18 +47,12 @@ namespace DiscordBingoBot.Commands.BingoCommands
                         stringBuilder.AppendLine("Row" + (index + 1) + ": " +
                                                  string.Join(" | ", player.Grid.Rows[index].Items));
                     }
-
-                    var playerSocket = Context.Guild.Users.FirstOrDefault(u => u.Mention == player.Name);
-                    if (playerSocket == null)
-                    {
-                       await _logger.Warn("Player " + player.Name + " no longer exists");
-                       continue;
-                    }
-
+                    
                     await playerSocket.SendMessageAsync(stringBuilder.ToString());
                 }
 
                 await ReplyAsync("A new round has been started");
+                await ReplyAsync("The first win condition is: " + result.Info.FirstWinCondition);
             }
             else
             {

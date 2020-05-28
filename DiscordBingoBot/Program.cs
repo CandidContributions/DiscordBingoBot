@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBingoBot.Commands;
 using DiscordBingoBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,11 +32,16 @@ namespace DiscordBingoBot
             _client.Log += _logger.Log;
             _commandService = new CommandService();
 
-            _commandHandler = new CommandHandler(BuildServiceProvider(_logger), _client, new CommandService(), _config);
+            _commandHandler = new CommandHandler(BuildServiceProvider(_logger), _client, _commandService, _config);
             await _commandHandler.InstallCommandsAsync();
 
             await _client.LoginAsync(TokenType.Bot, _config["DiscordBotToken"]);
-            await _client.SetActivityAsync(new Game("!bingo help", ActivityType.Watching));
+            var helpCommand = _commandService.Commands.FirstOrDefault(c => c.Name == "help");
+            if (helpCommand != null)
+            {
+                await _client.SetActivityAsync(new Game(_config["DiscordBotPrefix"] + helpCommand.Name, ActivityType.Watching));
+            }
+            
             await _client.StartAsync();
 
             // Block this task until the program is closed.

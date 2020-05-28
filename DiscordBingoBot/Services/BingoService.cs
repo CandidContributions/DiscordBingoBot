@@ -65,25 +65,25 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success();
         }
 
-        public Outcome<string> StartRound()
+        public Outcome<StartRoundOutcome> StartRound()
         {
             if (_isActive == false)
             {
-                return Outcome<string>.Fail("No active game found");
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome{Error = "No active game found"});
             }
             if (_roundActive)
             {
-                return Outcome<string>.Fail("There is already a round active");
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = "There is already a round active"});
             }
 
             if (_players.Count < 1)
             {
-                return Outcome<string>.Fail("Need at least 2 players to play");
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = "Need at least 2 players to play"});
             }
 
             RoundReset();
             _roundActive = true;
-            return Outcome<string>.Success();
+            return Outcome<StartRoundOutcome>.Success(new StartRoundOutcome{FirstWinCondition = _winConditions.First().Description,NumberOfWinConditions = _winConditions.Count});
         }
 
         public Outcome<string> NextItem()
