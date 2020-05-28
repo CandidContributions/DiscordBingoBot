@@ -25,11 +25,11 @@ namespace DiscordBingoBot.Commands.BingoCommands
             var next = _bingoService.NextItem();
             if (next.Result)
             {
-                await ReplyAsync("And the next one is " + next.Reason);
+                await ReplyAsync("And the next one is " + next.Info);
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't call a new item: " + next.Reason);
+                await Context.User.SendMessageAsync("Can't call a new item: " + next.Info);
             }
 
             await message.DeleteAsync();

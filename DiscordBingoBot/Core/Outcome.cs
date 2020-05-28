@@ -5,50 +5,50 @@ namespace DiscordBingoBot.Core
     /// <summary>
     /// Returns a boolean and the reason why that result was returned if it was false
     /// </summary>
-    public struct Outcome<TReason> : IEquatable<Outcome<TReason>>
+    public struct Outcome<Tinfo> : IEquatable<Outcome<Tinfo>>
     {
-        private readonly TReason _reason;
+        private readonly Tinfo _info;
 
         public bool Result { get; }
 
-        public TReason Reason => _reason;
+        public Tinfo Info => _info;
 
-        private Outcome(bool result, TReason reason)
+        private Outcome(bool result, Tinfo info)
         {
             Result = result;
-            _reason = reason;
+            _info = info;
         }
 
-        public static Outcome<TReason> Success()
+        public static Outcome<Tinfo> Success()
         {
-            return new Outcome<TReason>(true, default);
+            return new Outcome<Tinfo>(true, default);
         }
 
-        public static Outcome<TReason> Success(TReason value)
+        public static Outcome<Tinfo> Success(Tinfo value)
         {
-            return new Outcome<TReason>(true, value);
+            return new Outcome<Tinfo>(true, value);
         }
 
-        public static Outcome<TReason> Fail(TReason reason)
+        public static Outcome<Tinfo> Fail(Tinfo info)
         {
-            return new Outcome<TReason>(false, reason);
+            return new Outcome<Tinfo>(false, info);
         }
 
-        public bool Equals(Outcome<TReason> other)
+        public bool Equals(Outcome<Tinfo> other)
         {
-            return Result == other.Result && Reason.Equals(other.Reason);
+            return Result == other.Result && Info.Equals(other.Info);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Outcome<TReason> other && Equals(other);
+            return obj is Outcome<Tinfo> other && Equals(other);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Result.GetHashCode() * 397) ^ _reason.GetHashCode();
+                return (Result.GetHashCode() * 397) ^ _info.GetHashCode();
             }
         }
     }

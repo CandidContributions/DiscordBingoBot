@@ -5,6 +5,8 @@ using System.Text;
 using DiscordBingoBot.Core;
 using DiscordBingoBot.Extenstions;
 using DiscordBingoBot.Models;
+using DiscordBingoBot.Outcomes;
+using DiscordBingoBot.WinConditions;
 
 namespace DiscordBingoBot.Services
 {
@@ -24,6 +26,8 @@ namespace DiscordBingoBot.Services
         private List<string> _items;
         private List<Player> _players;
         private List<string> _roundItems;
+        private List<IWinCondition> _winConditions = new List<IWinCondition> { new OneRowWinCondition(), new FullCardWinCondition() };
+        private int _winners = 0;
         public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
         public Outcome<string> Start()
@@ -103,19 +107,30 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success(item);
         }
 
-        public Outcome<string> CheckBingo(string playerName)
+        public Outcome<CheckBingoOutcome> CheckBingo(string playerName)
         {
             var player = _players.FirstOrDefault(p => p.Name == playerName);
             if (player == null)
             {
-                return Outcome<string>.Fail("You are not registered");
+                return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = "You are not registered" });
             }
 
-            if (GetPlayerGrid(playerName).IsFullyMarked())
+            var winningOutcome = Outcome<CheckBingoOutcome>.Success(new CheckBingoOutcome());
+            if (_winConditions[_winners].ConditionMet(GetPlayerGrid(playerName)))
             {
-                return Outcome<string>.Success();
+                _winners++;
+                if (_winners >= _winConditions.Count)
+                {
+                    _roundActive = false;
+                    winningOutcome.Info.RoundHasEnded = true;
+                }
+                else
+                {
+                    winningOutcome.Info.NextWinCondition = _winConditions[_winners].Description;
+                }
+                return winningOutcome;
             }
-            return Outcome<string>.Fail("Liar liar, pants on fire!");
+            return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = "We think you might have made a mistake there." });
         }
 
         public Outcome<string> Stop()
@@ -152,6 +167,7 @@ namespace DiscordBingoBot.Services
             var roundGuid = Guid.NewGuid();
             var random = RandomFactory.FromGuid(roundGuid);
             _roundItems.Shuffle(random);
+            _winners = 0;
         }
 
         private void AssingGridsToPlayers()

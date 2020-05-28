@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using DiscordBingoBot.Core;
 using DiscordBingoBot.Models;
+using DiscordBingoBot.Outcomes;
 
 namespace DiscordBingoBot.Services
 {
@@ -10,7 +11,7 @@ namespace DiscordBingoBot.Services
         Outcome<string> Register(string playerName);
         Outcome<string> StartRound();
         Outcome<string> NextItem();
-        Outcome<string> CheckBingo(string playerName);
+        Outcome<CheckBingoOutcome> CheckBingo(string playerName);
         Outcome<string> Stop();
         IReadOnlyCollection<Player> Players { get; }
     }

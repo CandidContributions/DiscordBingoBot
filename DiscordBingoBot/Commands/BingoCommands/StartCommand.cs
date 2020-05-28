@@ -29,7 +29,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't start a bingo game: " + result.Reason);
+                await Context.User.SendMessageAsync("Can't start a bingo game: " + result.Info);
             }
 
             await message.DeleteAsync();

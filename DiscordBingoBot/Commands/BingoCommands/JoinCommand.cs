@@ -29,7 +29,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
             else
             {
-                await ReplyAsync(Context.User.Mention + " can't join the Bingo game: " + result.Reason);
+                await ReplyAsync(Context.User.Mention + " can't join the Bingo game: " + result.Info);
             }
 
             await message.DeleteAsync();

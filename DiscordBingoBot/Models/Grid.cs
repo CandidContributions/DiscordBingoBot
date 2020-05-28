@@ -91,20 +91,9 @@ namespace DiscordBingoBot.Models
             }
         }
 
-        public bool IsFullyMarked()
+        public bool IsMarked(int row, int column)
         {
-            for (int i = 0; i < 5; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    if (_controlRows[i].Items[j] == false)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
+            return _controlRows[row].Items[column];
         }
     }
 }

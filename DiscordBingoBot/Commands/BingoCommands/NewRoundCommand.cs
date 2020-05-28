@@ -54,7 +54,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't start a new round: " + result.Reason);
+                await Context.User.SendMessageAsync("Can't start a new round: " + result.Info);
             }
 
             await message.DeleteAsync();

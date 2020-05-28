@@ -26,10 +26,20 @@ namespace DiscordBingoBot.Commands.BingoCommands
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " is a winner!");
+                // todo send the user a nice message
+
+                if (result.Info.RoundHasEnded == false)
+                {
+                    await ReplyAsync("The next win condition is: " + result.Info.NextWinCondition);
+                }
+                else
+                {
+                    await ReplyAsync("That concludes this round, registrations are open again");
+                }
             }
             else
             {
-                await Context.User.SendMessageAsync("Invalid bingo call: " + result.Reason);
+                await Context.User.SendMessageAsync("Invalid bingo call: " + result.Info);
             }
 
             await message.DeleteAsync();
