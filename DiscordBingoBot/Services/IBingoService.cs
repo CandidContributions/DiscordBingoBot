@@ -15,5 +15,6 @@ namespace DiscordBingoBot.Services
         Outcome<string> Stop();
         IReadOnlyCollection<Player> Players { get; }
         bool Verbose { get; }
+        Outcome<string> DeRegister(string name);
     }
 }

@@ -67,6 +67,23 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success();
         }
 
+        public Outcome<string> DeRegister(string name)
+        {
+            if (name.Trim().Length < 1)
+            {
+                return Outcome<string>.Fail("Invalid name");
+            }
+
+            var player = _players.FirstOrDefault(p => p.Name == name);
+            if (player == null)
+            {
+                return Outcome<string>.Fail(name + " is not registered");
+            }
+
+            _players.Remove(player);
+            return Outcome<string>.Success();
+        }
+
         public Outcome<StartRoundOutcome> StartRound(bool verbose)
         {
             Verbose = verbose;
