@@ -15,7 +15,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             _bingoService = bingoService;
         }
 
-        [Command("join")]
+        [Command("join"), RunMode = RunMode.Async]
         [Summary("Joins the active bingo game")]
         public async Task Join()
         {
