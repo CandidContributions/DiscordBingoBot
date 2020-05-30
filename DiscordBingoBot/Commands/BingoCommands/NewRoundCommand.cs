@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,12 +77,18 @@ namespace DiscordBingoBot.Commands.BingoCommands
                     }
 
                     var stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine("Your new card: " + player.Grid.GridId);
+                    stringBuilder.AppendLine("Your new card: " + player.Grid.GridId + "\n");
+
+                    stringBuilder.AppendLine("```=".PadRight(150, '=') + "\n");
                     for (var index = 0; index < player.Grid.Rows.Length; index++)
                     {
-                        stringBuilder.AppendLine("Row" + (index + 1) + ": " +
-                                                 string.Join(" | ", player.Grid.Rows[index].Items));
+                        //stringBuilder.AppendLine(string.Join(" | ", player.Grid.Rows[index].Items.Select(w => w.PadRight(25))));
+                        const int pad = -20;
+
+                        stringBuilder.AppendLine(
+                            $"{player.Grid.Rows[index].Items[0],pad}\t\t\t{player.Grid.Rows[index].Items[1],pad}\t\t\t{player.Grid.Rows[index].Items[2],pad}\t\t\t{player.Grid.Rows[index].Items[3],pad}\t\t\t{player.Grid.Rows[index].Items[4],pad}\n");
                     }
+                    stringBuilder.AppendLine("=".PadRight(150, '=') + "```\n");
 
                     await playerSocket.SendMessageAsync(stringBuilder.ToString());
                 }
