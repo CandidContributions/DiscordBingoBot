@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using DiscordBingoBot.Services;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DiscordBingoBot.Commands.BingoCommands
 {
@@ -24,14 +23,14 @@ namespace DiscordBingoBot.Commands.BingoCommands
             _permissionHandler = permissionHandler;
         }
 
-        [Command("newRound")]
+        [Command("newRound",RunMode = RunMode.Async)]
         [Summary("Starts a new round in the active bingo game")]
         public async Task NewRound()
         {
             await ExecuteNewRound();
         }
 
-        [Command("newRound")]
+        [Command("newRound", RunMode = RunMode.Async)]
         [Summary("Starts a new round in the active bingo game")]
         public async Task NewRoundVerbose(
             [Summary("Mode (verbose|silent)")]string mode)
@@ -53,6 +52,8 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
         private async Task ExecuteNewRound(bool verbose = true)
         {
+            const char gridSeperator = '*';
+
             if (_permissionHandler.HasBingoManagementPermissions(Context) == false)
             {
                 return;
@@ -76,11 +77,27 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
                     var stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine("Your new card: " + player.Grid.GridId);
+                    stringBuilder.AppendLine();
+
+                    var longestWordLength = player.Grid.Rows.SelectMany(r => r.Items).Max(i => i.Length);
+                    var cellWidth = longestWordLength + 2;
+                    var gridWith = cellWidth * player.Grid.Rows.Length + player.Grid.Rows.Length;
+                    stringBuilder.AppendLine("```" + "".PadRight(gridWith + 1, gridSeperator));
                     for (var index = 0; index < player.Grid.Rows.Length; index++)
                     {
-                        stringBuilder.AppendLine("Row" + (index + 1) + ": " +
-                                                 string.Join(" | ", player.Grid.Rows[index].Items));
+                        //stringBuilder.AppendLine(string.Join(" | ", player.Grid.Rows[index].Items.Select(w => w.PadRight(25))));
+                        stringBuilder.Append(gridSeperator);
+                        foreach (var item in player.Grid.Rows[index].Items)
+                        {
+                            var leftPad = (cellWidth - item.Length) / 2;
+                            stringBuilder.Append("".PadRight(leftPad, ' ') + item +
+                                                 "".PadRight(cellWidth - item.Length - leftPad, ' ') + gridSeperator);
+                            
+                        }
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine("".PadRight(gridWith +1, gridSeperator));
                     }
+                    stringBuilder.Append("```");
 
                     await playerSocket.SendMessageAsync(stringBuilder.ToString());
                 }
