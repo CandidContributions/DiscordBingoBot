@@ -8,7 +8,7 @@ namespace DiscordBingoBot.Services
     public interface IBingoService
     {
         Outcome<string> Start();
-        Outcome<string> Register(string playerName);
+        Outcome<string> Register(string mention, string nickName);
         Outcome<StartRoundOutcome> StartRound(bool verbose);
         Outcome<string> NextItem();
         Outcome<CheckBingoOutcome> CheckBingo(string playerName);

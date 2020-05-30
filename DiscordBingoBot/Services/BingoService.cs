@@ -44,9 +44,9 @@ namespace DiscordBingoBot.Services
             return Outcome<string>.Success();
         }
 
-        public Outcome<string> Register(string name)
+        public Outcome<string> Register(string mention, string nickName)
         {
-            if (name.Trim().Length < 1)
+            if (mention.Trim().Length < 1)
             {
                 return Outcome<string>.Fail("Invalid name");
             }
@@ -58,12 +58,12 @@ namespace DiscordBingoBot.Services
             {
                 return Outcome<string>.Fail("There is an active round, wait for the round to end");
             }
-            if (_players.Any(p => p.Name == name))
+            if (_players.Any(p => p.Name == mention))
             {
-                return Outcome<string>.Fail(name + " is already registered");
+                return Outcome<string>.Fail(mention + " is already registered");
             }
 
-            _players.Add(new Player(name));
+            _players.Add(new Player(mention,nickName));
             return Outcome<string>.Success();
         }
 
