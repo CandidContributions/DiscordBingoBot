@@ -39,11 +39,16 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             foreach (var player in players)
             {
-                builder.AddField(player.NickName,null);
+                builder.AddField(x =>
+                {
+
+                    x.Name = player.NickName;
+                    x.IsInline = false;
+                });
             }
 
+            await ReplyAsync("Active Player List", false, builder.Build());
             await message.DeleteAsync();
-            await ReplyAsync(embed:builder.Build());
         }
     }
 }
