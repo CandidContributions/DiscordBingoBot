@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -31,23 +32,19 @@ namespace DiscordBingoBot.Commands.BingoCommands
             var message = Context.Message;
 
             var players = _bingoService.Players;
-            var builder = new EmbedBuilder()
+            var builder = new EmbedBuilder
             {
-                Color = new Color(114, 137, 218),
-                Description = "Players in the active bingo game"
+                Color = new Color(114, 137, 218)
             };
 
-            foreach (var player in players)
+            builder.AddField(x =>
             {
-                builder.AddField(x =>
-                {
+                x.Name = "Players in the active bingo game";
+                x.Value = string.Join('\n', players.Select(p => p.Name));
+                x.IsInline = false;
+            });
 
-                    x.Name = player.NickName;
-                    x.IsInline = false;
-                });
-            }
-
-            await ReplyAsync("Active Player List", false, builder.Build());
+            await ReplyAsync("", false, builder.Build());
             await message.DeleteAsync();
         }
     }
