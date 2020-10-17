@@ -53,6 +53,7 @@ namespace DiscordBingoBot
             .AddSingleton(_config)
             .AddSingleton(_commandService)
             .AddSingleton<CommandHandler>()
+            .AddSingleton<IConfigurationService, ConfigurationService>()
             .AddSingleton<IBingoService,BingoService>()
             .AddSingleton<ICsvReader,CsvReader>()
             .AddSingleton(logger)

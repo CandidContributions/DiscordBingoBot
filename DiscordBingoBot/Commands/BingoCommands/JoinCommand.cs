@@ -21,7 +21,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = _bingoService.Register(Context.User.Mention, Context.Guild.GetUser(Context.User.Id).Nickname);
+            var result = await _bingoService.Register(Context.User.Mention, Context.Guild.GetUser(Context.User.Id).Nickname).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " has joined the Bingo game");

@@ -37,7 +37,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             var message = Context.Message;
 
-            var result = _bingoService.Start();
+            var result = await _bingoService.Start().ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync("Bingo game started by " + Context.User.Mention);

@@ -61,7 +61,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             var message = Context.Message;
 
-            var result = _bingoService.StartRound(verbose);
+            var result = await _bingoService.StartRound(verbose).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync("A new round is starting with " + result.Info.NumberOfWinConditions + " win conditions");

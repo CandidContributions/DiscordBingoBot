@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using DiscordBingoBot.Constants;
 using DiscordBingoBot.Core;
 using DiscordBingoBot.Extenstions;
 using DiscordBingoBot.Models;
+using DiscordBingoBot.Models.BingoConfiguration;
 using DiscordBingoBot.Outcomes;
 using DiscordBingoBot.WinConditions;
 
@@ -14,91 +17,93 @@ namespace DiscordBingoBot.Services
     {
         private readonly ICsvReader _csvReader;
         private readonly ILogger _logger;
+        private readonly IConfigurationService _configurationService;
 
-        public BingoService(ICsvReader csvReader, ILogger logger)
+        public BingoService(ICsvReader csvReader, ILogger logger, IConfigurationService configurationService)
         {
             _csvReader = csvReader;
             _logger = logger;
+            _configurationService = configurationService;
         }
 
         private bool _isActive;
         private bool _roundActive;
-        private List<string> _items;
         private List<Player> _players;
         private List<string> _roundItems;
         private List<IWinCondition> _winConditions = new List<IWinCondition> { new OneRowWinCondition(), new FullCardWinCondition() };
+        private BingoConfiguration _configuration;
         private int _winners = 0;
         public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
         public bool Verbose { get; private set; }
 
-        public Outcome<string> Start()
+        public async Task<Outcome<string>> Start()
         {
             if (_isActive)
             {
-                return Outcome<string>.Fail("There is currently a game active");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Start.AlreadyActive).ConfigureAwait(false));
             }
 
-            GameReset();
+            await GameReset().ConfigureAwait(false);
 
             return Outcome<string>.Success();
         }
 
-        public Outcome<string> Register(string mention, string nickName)
+        public async Task<Outcome<string>> Register(string mention, string nickName)
         {
             if (mention.Trim().Length < 1)
             {
-                return Outcome<string>.Fail("Invalid name");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.InvalidName).ConfigureAwait(false));
             }
             if (_isActive == false)
             {
-                return Outcome<string>.Fail("No active game found");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.NoActiveGame).ConfigureAwait(false));
             }
             if (_roundActive)
             {
-                return Outcome<string>.Fail("There is an active round, wait for the round to end");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.ActiveRound).ConfigureAwait(false));
             }
             if (_players.Any(p => p.Name == mention))
             {
-                return Outcome<string>.Fail(mention + " is already registered");
+                return Outcome<string>.Fail((await _configurationService.GetPhrase(PhraseKeys.Register.AlreadyRegistered).ConfigureAwait(false)).Replace("{0}",mention));
             }
 
             _players.Add(new Player(mention,nickName));
             return Outcome<string>.Success();
         }
 
-        public Outcome<string> DeRegister(string name)
+        public async Task<Outcome<string>> DeRegister(string name)
         {
             if (name.Trim().Length < 1)
             {
-                return Outcome<string>.Fail("Invalid name");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.DeRegister.InvalidName).ConfigureAwait(false));
             }
 
             var player = _players.FirstOrDefault(p => p.Name == name);
             if (player == null)
             {
-                return Outcome<string>.Fail(name + " is not registered");
+                return Outcome<string>.Fail((await _configurationService.GetPhrase(PhraseKeys.DeRegister.NotRegistered).ConfigureAwait(false)).Replace("{0}", name));
             }
 
             _players.Remove(player);
             return Outcome<string>.Success();
         }
 
-        public Outcome<StartRoundOutcome> StartRound(bool verbose)
+        public async Task<Outcome<StartRoundOutcome>> StartRound(bool verbose)
         {
             Verbose = verbose;
             if (_isActive == false)
             {
-                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome{Error = "No active game found"});
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome{Error = await _configurationService.GetPhrase(PhraseKeys.StartRound.NoActiveGame).ConfigureAwait(false)});
             }
             if (_roundActive)
             {
-                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = "There is already a round active"});
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = await _configurationService.GetPhrase(PhraseKeys.StartRound.ActiveRound).ConfigureAwait(false) });
             }
 
             if (_players.Count < 1)
             {
-                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = "Need at least 2 players to play"});
+                return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = await _configurationService.GetPhrase(PhraseKeys.StartRound.NotEnoughPlayers).ConfigureAwait(false) });
             }
 
             RoundReset();
@@ -106,33 +111,33 @@ namespace DiscordBingoBot.Services
             return Outcome<StartRoundOutcome>.Success(new StartRoundOutcome{FirstWinCondition = _winConditions.First().Description,NumberOfWinConditions = _winConditions.Count});
         }
 
-        public Outcome<string> NextItem()
+        public async Task<Outcome<string>> NextItem()
         {
             if (_isActive == false)
             {
-                return Outcome<string>.Fail("No active game found");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Next.NoActiveGame).ConfigureAwait(false));
             }
             if (_roundActive == false)
             {
-                return Outcome<string>.Fail("No active round");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Next.NoActiveRound).ConfigureAwait(false));
             }
-            // todo pick and item and move the tracker
+
             var item = _roundItems.FirstOrDefault();
             if (item == null)
             {
-                return Outcome<string>.Fail("No items remaining, everyone must be asleep");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Next.NoRemainingItems).ConfigureAwait(false));
             }
             _roundItems.RemoveAt(0);
             MarkItemOnPlayerCards(item);
             return Outcome<string>.Success(item);
         }
 
-        public Outcome<CheckBingoOutcome> CheckBingo(string playerName)
+        public async Task<Outcome<CheckBingoOutcome>> CheckBingo(string playerName)
         {
             var player = _players.FirstOrDefault(p => p.Name == playerName);
             if (player == null)
             {
-                return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = "You are not registered" });
+                return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = await _configurationService.GetPhrase(PhraseKeys.Bingo.NotRegistered).ConfigureAwait(false) });
             }
 
             var winningOutcome = Outcome<CheckBingoOutcome>.Success(new CheckBingoOutcome());
@@ -150,14 +155,14 @@ namespace DiscordBingoBot.Services
                 }
                 return winningOutcome;
             }
-            return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = "We think you might have made a mistake there." });
+            return Outcome<CheckBingoOutcome>.Fail(new CheckBingoOutcome { Error = await _configurationService.GetPhrase(PhraseKeys.Bingo.Mistake).ConfigureAwait(false) });
         }
 
-        public Outcome<string> Stop()
+        public async Task<Outcome<string>> Stop()
         {
             if (_isActive == false)
             {
-                return Outcome<string>.Fail("No active game found");
+                return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Stop.NoActive).ConfigureAwait(false));
             }
 
             _isActive = false;
@@ -170,11 +175,19 @@ namespace DiscordBingoBot.Services
             return _players.First(p => p.Name == playerName).Grid;
         }
 
-        private void GameReset()
+        public async Task LoadConfiguration(bool force = false)
         {
+            if (force || _configuration == null)
+            {
+                _configuration = await _configurationService.GetConfiguration(force).ConfigureAwait(false);
+            }
+        }
+
+        private async Task GameReset()
+        {
+            await LoadConfiguration().ConfigureAwait(false);
             _isActive = true;
             _roundActive = false;
-            _items = _csvReader.Read("wordList.csv");
             _players = new List<Player>();
         }
 
@@ -183,7 +196,7 @@ namespace DiscordBingoBot.Services
             AssingGridsToPlayers();
 
             // randomize the pool
-            _roundItems = new List<string>(_items);
+            _roundItems = new List<string>(_configuration.Words);
             var roundGuid = Guid.NewGuid();
             var random = RandomFactory.FromGuid(roundGuid);
             _roundItems.Shuffle(random);
@@ -195,7 +208,7 @@ namespace DiscordBingoBot.Services
             foreach (var player in _players)
             {
                 player.Grid = new Grid(Guid.NewGuid());
-                player.Grid.Populate(_items);
+                player.Grid.Populate(_configuration.Words);
             }
         }
 

@@ -28,7 +28,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = _bingoService.CheckBingo(Context.User.Mention);
+            var result = await _bingoService.CheckBingo(Context.User.Mention).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " is a winner!");

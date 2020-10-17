@@ -21,7 +21,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = _bingoService.DeRegister(Context.User.Mention);
+            var result = await _bingoService.DeRegister(Context.User.Mention).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " has left the Bingo game");

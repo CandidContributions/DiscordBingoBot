@@ -29,7 +29,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             var message = Context.Message;
 
-            var next = _bingoService.NextItem();
+            var next = await _bingoService.NextItem().ConfigureAwait(false);
             if (next.Result)
             {
                 var reply = "And the next one is " + next.Info;
