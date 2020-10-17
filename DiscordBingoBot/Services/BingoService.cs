@@ -26,8 +26,6 @@ namespace DiscordBingoBot.Services
             _configurationService = configurationService;
         }
 
-        private bool _isActive;
-        private bool _roundActive;
         private List<Player> _players;
         private List<string> _roundItems;
         private List<IWinCondition> _winConditions = new List<IWinCondition> { new OneRowWinCondition(), new FullCardWinCondition() };
@@ -36,10 +34,12 @@ namespace DiscordBingoBot.Services
         public IReadOnlyCollection<Player> Players => _players.AsReadOnly();
 
         public bool Verbose { get; private set; }
+        public bool IsActive { get; private set; }
+        public bool IsRoundActive { get; private set; }
 
         public async Task<Outcome<string>> Start()
         {
-            if (_isActive)
+            if (IsActive)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Start.AlreadyActive).ConfigureAwait(false));
             }
@@ -55,11 +55,11 @@ namespace DiscordBingoBot.Services
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.InvalidName).ConfigureAwait(false));
             }
-            if (_isActive == false)
+            if (IsActive == false)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.NoActiveGame).ConfigureAwait(false));
             }
-            if (_roundActive)
+            if (IsRoundActive)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Register.ActiveRound).ConfigureAwait(false));
             }
@@ -92,11 +92,11 @@ namespace DiscordBingoBot.Services
         public async Task<Outcome<StartRoundOutcome>> StartRound(bool verbose)
         {
             Verbose = verbose;
-            if (_isActive == false)
+            if (IsActive == false)
             {
                 return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome{Error = await _configurationService.GetPhrase(PhraseKeys.StartRound.NoActiveGame).ConfigureAwait(false)});
             }
-            if (_roundActive)
+            if (IsRoundActive)
             {
                 return Outcome<StartRoundOutcome>.Fail(new StartRoundOutcome { Error = await _configurationService.GetPhrase(PhraseKeys.StartRound.ActiveRound).ConfigureAwait(false) });
             }
@@ -107,17 +107,17 @@ namespace DiscordBingoBot.Services
             }
 
             RoundReset();
-            _roundActive = true;
+            IsRoundActive = true;
             return Outcome<StartRoundOutcome>.Success(new StartRoundOutcome{FirstWinCondition = _winConditions.First().Description,NumberOfWinConditions = _winConditions.Count});
         }
 
         public async Task<Outcome<string>> NextItem()
         {
-            if (_isActive == false)
+            if (IsActive == false)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Next.NoActiveGame).ConfigureAwait(false));
             }
-            if (_roundActive == false)
+            if (IsRoundActive == false)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Next.NoActiveRound).ConfigureAwait(false));
             }
@@ -146,7 +146,7 @@ namespace DiscordBingoBot.Services
                 _winners++;
                 if (_winners >= _winConditions.Count)
                 {
-                    _roundActive = false;
+                    IsRoundActive = false;
                     winningOutcome.Info.RoundHasEnded = true;
                 }
                 else
@@ -160,13 +160,13 @@ namespace DiscordBingoBot.Services
 
         public async Task<Outcome<string>> Stop()
         {
-            if (_isActive == false)
+            if (IsActive == false)
             {
                 return Outcome<string>.Fail(await _configurationService.GetPhrase(PhraseKeys.Stop.NoActive).ConfigureAwait(false));
             }
 
-            _isActive = false;
-            _roundActive = false;
+            IsActive = false;
+            IsRoundActive = false;
             return Outcome<string>.Success();
         }
 
@@ -186,8 +186,8 @@ namespace DiscordBingoBot.Services
         private async Task GameReset()
         {
             await LoadConfiguration().ConfigureAwait(false);
-            _isActive = true;
-            _roundActive = false;
+            IsActive = true;
+            IsRoundActive = false;
             _players = new List<Player>();
         }
 

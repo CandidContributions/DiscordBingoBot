@@ -16,6 +16,8 @@ namespace DiscordBingoBot.Services
         Task<Outcome<string>> Stop();
         IReadOnlyCollection<Player> Players { get; }
         bool Verbose { get; }
+        bool IsActive { get; }
+        bool IsRoundActive { get; }
         Task<Outcome<string>> DeRegister(string name);
         Task LoadConfiguration(bool force = false);
     }

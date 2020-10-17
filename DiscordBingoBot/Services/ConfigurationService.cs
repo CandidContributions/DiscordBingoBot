@@ -120,6 +120,7 @@ namespace DiscordBingoBot.Services
             new KeyedPhrases(PhraseKeys.Next.NoActiveGame,new List<Phrase>{new Phrase("No active game found", 0)}),
             new KeyedPhrases(PhraseKeys.Next.NoActiveRound,new List<Phrase>{new Phrase("No active game found", 0)}),
             new KeyedPhrases(PhraseKeys.Next.NoRemainingItems,new List<Phrase>{new Phrase("No items remaining, everyone must have fallen asleep", 0)}),
+            new KeyedPhrases(PhraseKeys.Next.Success,new List<Phrase>{new Phrase("And the next one is {0}", 0)}),
 
             new KeyedPhrases(PhraseKeys.Bingo.NotRegistered,new List<Phrase>{new Phrase("You are not registered", 0)}),
             new KeyedPhrases(PhraseKeys.Bingo.Mistake,new List<Phrase>{new Phrase("We think you might have made a mistake there", 0)}),

@@ -14,13 +14,15 @@ namespace DiscordBingoBot.Commands.BingoCommands
         private readonly IBingoService _bingoService;
         private readonly ILogger _logger;
         private readonly IPermissionHandler _permissionHandler;
+        private readonly IAutoNextService _autoNextService;
 
         public NewRoundCommand(IBingoService bingoService, ILogger logger,
-            IPermissionHandler permissionHandler)
+            IPermissionHandler permissionHandler, IAutoNextService autoNextService)
         {
             _bingoService = bingoService;
             _logger = logger;
             _permissionHandler = permissionHandler;
+            _autoNextService = autoNextService;
         }
 
         [Command("newRound",RunMode = RunMode.Async)]
@@ -50,7 +52,21 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
         }
 
-        private async Task ExecuteNewRound(bool verbose = true)
+        [Command("newRoundAuto", RunMode = RunMode.Async)]
+        [Summary("Starts a new round in the active bingo game that automatically calls out words")]
+        public async Task NewRoundAutomatic()
+        {
+            await ExecuteNewRound(auto: true);
+
+            if (_bingoService.IsRoundActive)
+            {
+                // succeeded in starting a round => start the automatic calling
+                await _autoNextService.Start(Context);
+                await Context.User.SendMessageAsync("Automatic round started");
+            }
+        }
+
+        private async Task ExecuteNewRound(bool verbose = true, bool auto = false)
         {
             const char gridSeperator = '*';
 
@@ -107,7 +123,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
             else
             {
-                await Context.User.SendMessageAsync("Can't start a new round: " + result.Info);
+                await Context.User.SendMessageAsync("Can't start a new round: " + result.Info.Error);
             }
 
             await message.DeleteAsync();

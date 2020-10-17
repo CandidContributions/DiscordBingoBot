@@ -55,6 +55,7 @@ namespace DiscordBingoBot
             .AddSingleton<CommandHandler>()
             .AddSingleton<IConfigurationService, ConfigurationService>()
             .AddSingleton<IBingoService,BingoService>()
+            .AddSingleton<IAutoNextService, AutoNextService>()
             .AddSingleton<ICsvReader,CsvReader>()
             .AddSingleton(logger)
             .AddSingleton<IPermissionHandler,PermissionHandler>()

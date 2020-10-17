@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Constants;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -11,11 +12,14 @@ namespace DiscordBingoBot.Commands.BingoCommands
     {
         private readonly IBingoService _bingoService;
         private readonly IPermissionHandler _permissionHandler;
+        private readonly IConfigurationService _configurationService;
 
-        public NextCommand(IBingoService bingoService, IPermissionHandler permissionHandler)
+        public NextCommand(IBingoService bingoService, IPermissionHandler permissionHandler,
+            IConfigurationService configurationService)
         {
             _bingoService = bingoService;
             _permissionHandler = permissionHandler;
+            _configurationService = configurationService;
         }
 
         [Command("next")]
@@ -32,7 +36,7 @@ namespace DiscordBingoBot.Commands.BingoCommands
             var next = await _bingoService.NextItem().ConfigureAwait(false);
             if (next.Result)
             {
-                var reply = "And the next one is " + next.Info;
+                var reply = string.Format(await _configurationService.GetPhrase(PhraseKeys.Next.Success).ConfigureAwait(false), next.Info);
                 if (_bingoService.Verbose)
                 {
                     await ReplyAsync(reply);

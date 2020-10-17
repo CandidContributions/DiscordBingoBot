@@ -37,6 +37,7 @@ namespace DiscordBingoBot.Constants
             public const string NoActiveGame = "Next.NoActiveGame";
             public const string NoActiveRound = "Next.NoActiveRound";
             public const string NoRemainingItems = "Next.NoRemainingItems";
+            public const string Success = "Next.Success";
         }
 
         public static class Bingo
@@ -45,7 +46,6 @@ namespace DiscordBingoBot.Constants
             public const string Mistake = "Bingo.Mistake";
         }
 
-        //todo create in umbraco below this
         public static class Stop
         {
             public const string NoActive = "Bingo.NoActive";
