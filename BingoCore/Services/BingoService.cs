@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using DiscordBingoBot.Constants;
-using DiscordBingoBot.Core;
-using DiscordBingoBot.Extenstions;
-using DiscordBingoBot.Models;
-using DiscordBingoBot.Models.BingoConfiguration;
-using DiscordBingoBot.Outcomes;
-using DiscordBingoBot.WinConditions;
+using BingoCore.Constants;
+using BingoCore.Core;
+using BingoCore.Extensions;
+using BingoCore.Factories;
+using BingoCore.Models;
+using BingoCore.Models.BingoConfiguration;
+using BingoCore.Outcomes;
+using BingoCore.WinConditions;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public class BingoService : IBingoService
     {

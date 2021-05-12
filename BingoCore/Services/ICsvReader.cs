@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public interface ICsvReader
     {

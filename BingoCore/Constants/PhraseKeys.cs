@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DiscordBingoBot.Constants
+﻿namespace BingoCore.Constants
 {
     public static class PhraseKeys
     {

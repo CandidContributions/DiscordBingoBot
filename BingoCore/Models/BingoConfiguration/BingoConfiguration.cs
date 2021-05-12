@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
-namespace DiscordBingoBot.Models.BingoConfiguration
+namespace BingoCore.Models.BingoConfiguration
 {
     public class BingoConfiguration
     {

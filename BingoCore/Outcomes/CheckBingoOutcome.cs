@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DiscordBingoBot.Outcomes
+﻿namespace BingoCore.Outcomes
 {
     public class CheckBingoOutcome
     {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
-using System.Text;
-using DiscordBingoBot.Extenstions;
+using BingoCore.Extensions;
+using BingoCore.Factories;
 
-namespace DiscordBingoBot.Models
+namespace BingoCore.Models
 {
     public class Grid
     {

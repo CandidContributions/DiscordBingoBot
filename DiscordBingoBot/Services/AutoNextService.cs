@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using BingoCore.Constants;
+using BingoCore.Models.BingoConfiguration;
+using BingoCore.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBingoBot.Constants;
-using DiscordBingoBot.Models.BingoConfiguration;
 
 namespace DiscordBingoBot.Services
 {
@@ -83,10 +84,10 @@ namespace DiscordBingoBot.Services
             var randomDelay = _random.Next(settings.MinimumTimeout, settings.MaximumTimeout + 1);
 
             // get the difference between random and preferred;
-            var difference = (randomDelay - settings.PreferedTimeout) * -1;
+            var difference = (randomDelay - settings.PreferredTimeout) * -1;
 
             // add the skewFactor
-            var delay = randomDelay + (difference * settings.PreferedTimeoutSkewPercentage / 100);
+            var delay = randomDelay + (difference * settings.PreferredTimeoutSkewPercentage / 100);
             return delay;
         }
     }

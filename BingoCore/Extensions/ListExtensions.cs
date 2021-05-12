@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
-namespace DiscordBingoBot.Extenstions
+namespace BingoCore.Extensions
 {
     public static class ListExtensions
     {

@@ -4,13 +4,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using DiscordBingoBot.Constants;
-using DiscordBingoBot.Models;
-using DiscordBingoBot.Models.BingoConfiguration;
+using BingoCore.Constants;
+using BingoCore.Models.BingoConfiguration;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public class ConfigurationService : IConfigurationService
     {

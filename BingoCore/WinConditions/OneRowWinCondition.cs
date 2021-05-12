@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DiscordBingoBot.Models;
+﻿using BingoCore.Models;
 
-namespace DiscordBingoBot.WinConditions
+namespace BingoCore.WinConditions
 {
     public class OneRowWinCondition : IWinCondition
     {

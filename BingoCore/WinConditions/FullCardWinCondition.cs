@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DiscordBingoBot.Models;
+﻿using BingoCore.Models;
 
-namespace DiscordBingoBot.WinConditions
+namespace BingoCore.WinConditions
 {
     public class FullCardWinCondition : IWinCondition
     {
@@ -15,7 +12,6 @@ namespace DiscordBingoBot.WinConditions
             {
                 for (int j = 0; j < grid.Rows[i].Items.Length; j++)
                 {
-                    if (grid.IsMarked(i,j) == false)
                     if (grid.IsMarked(i,j) == false)
                     {
                         return false;

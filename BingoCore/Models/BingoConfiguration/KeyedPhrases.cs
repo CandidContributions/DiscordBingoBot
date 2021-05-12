@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
 
-namespace DiscordBingoBot.Models.BingoConfiguration
+namespace BingoCore.Models.BingoConfiguration
 {
     public class KeyedPhrases
     {

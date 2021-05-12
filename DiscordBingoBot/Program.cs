@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BingoCore.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;

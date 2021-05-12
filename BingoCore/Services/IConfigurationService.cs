@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
-using DiscordBingoBot.Models;
-using DiscordBingoBot.Models.BingoConfiguration;
+using BingoCore.Models.BingoConfiguration;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public interface IConfigurationService
     {

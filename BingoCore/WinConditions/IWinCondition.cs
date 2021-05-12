@@ -1,6 +1,6 @@
-﻿using DiscordBingoBot.Models;
+﻿using BingoCore.Models;
 
-namespace DiscordBingoBot.WinConditions
+namespace BingoCore.WinConditions
 {
     public interface IWinCondition
     {

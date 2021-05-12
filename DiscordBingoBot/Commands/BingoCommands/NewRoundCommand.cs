@@ -4,6 +4,7 @@ using DiscordBingoBot.Services;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BingoCore.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
 {

@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using BingoCore.Constants;
+using BingoCore.Services;
 using Discord;
 using Discord.Commands;
-using DiscordBingoBot.Constants;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands

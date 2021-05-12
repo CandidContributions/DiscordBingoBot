@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public interface IAutoNextService
     {

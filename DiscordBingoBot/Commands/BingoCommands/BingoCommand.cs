@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using BingoCore.Services;
 using Discord;
 using Discord.Commands;
 using DiscordBingoBot.Services;

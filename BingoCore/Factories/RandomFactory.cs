@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace DiscordBingoBot.Extenstions
+namespace BingoCore.Factories
 {
     public static class RandomFactory
     {

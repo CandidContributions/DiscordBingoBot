@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DiscordBingoBot.Core
+namespace BingoCore.Core
 {
     /// <summary>
     /// Returns a boolean and the reason why that result was returned if it was false

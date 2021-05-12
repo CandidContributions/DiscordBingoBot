@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DiscordBingoBot.Core;
-using DiscordBingoBot.Models;
-using DiscordBingoBot.Outcomes;
+using BingoCore.Core;
+using BingoCore.Models;
+using BingoCore.Outcomes;
 
-namespace DiscordBingoBot.Services
+namespace BingoCore.Services
 {
     public interface IBingoService
     {

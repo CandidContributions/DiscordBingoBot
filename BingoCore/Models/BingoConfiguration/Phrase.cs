@@ -1,4 +1,4 @@
-﻿namespace DiscordBingoBot.Models.BingoConfiguration
+﻿namespace BingoCore.Models.BingoConfiguration
 {
     public class Phrase
     {
