@@ -13,13 +13,13 @@ using BingoCore.WinConditions;
 
 namespace BingoCore.Services
 {
-    public class BingoService : IBingoService
+    public class BingoGame
     {
         private readonly ICsvReader _csvReader;
         private readonly ILogger _logger;
         private readonly IConfigurationService _configurationService;
 
-        public BingoService(ICsvReader csvReader, ILogger logger, IConfigurationService configurationService)
+        public BingoGame(ICsvReader csvReader, ILogger logger, IConfigurationService configurationService)
         {
             _csvReader = csvReader;
             _logger = logger;

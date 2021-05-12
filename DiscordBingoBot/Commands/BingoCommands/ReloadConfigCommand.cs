@@ -2,6 +2,7 @@
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -33,7 +34,8 @@ namespace DiscordBingoBot.Commands.BingoCommands
             // todo should add a way to handle errors
             await message.DeleteAsync();
             await Context.User.SendMessageAsync("Updating configuration");
-            await _bingoService.LoadConfiguration(true);
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+            await bingoGame.LoadConfiguration(true);
             await Context.User.SendMessageAsync("Configuration updated");
         }
     }

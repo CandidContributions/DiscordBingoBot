@@ -2,6 +2,7 @@
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -12,11 +13,13 @@ namespace DiscordBingoBot.Commands.BingoCommands
     {
         private readonly IBingoService _bingoService;
         private readonly IPermissionHandler _permissionHandler;
+        private readonly IAutoNextService _autoNextService;
 
-        public StopCommand(IBingoService bingoService, IPermissionHandler permissionHandler)
+        public StopCommand(IBingoService bingoService, IPermissionHandler permissionHandler, IAutoNextService autoNextService)
         {
             _bingoService = bingoService;
             _permissionHandler = permissionHandler;
+            _autoNextService = autoNextService;
         }
 
         [Command("stop")]
@@ -29,10 +32,13 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
 
             var message = Context.Message;
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
 
-            var result = await _bingoService.Stop().ConfigureAwait(false);
+            var result = await bingoGame.Stop().ConfigureAwait(false);
             if (result.Result)
             {
+                _autoNextService.Stop(Context);
+                _bingoService.RemoveGame(Context.GetChannelGuildIdentifier());
                 await ReplyAsync("Bingo game stopped by " + Context.User.Mention);
             }
             else

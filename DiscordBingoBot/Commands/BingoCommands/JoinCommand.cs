@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using BingoCore.Services;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -22,7 +23,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = await _bingoService.Register(Context.User.Mention, Context.Guild.GetUser(Context.User.Id).Nickname).ConfigureAwait(false);
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            var result = await bingoGame.Register(Context.User.Mention, Context.Guild.GetUser(Context.User.Id).Nickname).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " has joined the Bingo game");

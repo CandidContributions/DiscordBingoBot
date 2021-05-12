@@ -2,6 +2,7 @@
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -34,11 +35,13 @@ namespace DiscordBingoBot.Commands.BingoCommands
             var message = Context.Message;
             await message.DeleteAsync();
 
-            if (_bingoService.IsRoundActive == false)
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            if (bingoGame.IsRoundActive == false)
             {
                 //todo return a message
             }
-            else if (_autoNextService.Paused == false)
+            else if (_autoNextService.IsPaused(Context) == false)
             {
                 //todo return a message
             }

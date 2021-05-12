@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BingoCore.Services;
+using DiscordBingoBot.Extensions;
 
 namespace DiscordBingoBot.Commands.BingoCommands
 {
@@ -59,7 +60,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             await ExecuteNewRound(auto: true);
 
-            if (_bingoService.IsRoundActive)
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            if (bingoGame.IsRoundActive)
             {
                 // succeeded in starting a round => start the automatic calling
                 await _autoNextService.Start(Context);
@@ -78,12 +81,14 @@ namespace DiscordBingoBot.Commands.BingoCommands
 
             var message = Context.Message;
 
-            var result = await _bingoService.StartRound(verbose).ConfigureAwait(false);
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            var result = await bingoGame.StartRound(verbose).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync("A new round is starting with " + result.Info.NumberOfWinConditions + " win conditions");
                 await ReplyAsync("Handing out new cards");
-                foreach (var player in _bingoService.Players)
+                foreach (var player in bingoGame.Players)
                 {
                     var playerSocket = Context.Guild.Users.FirstOrDefault(u => u.Mention == player.Name);
                     if (playerSocket == null)

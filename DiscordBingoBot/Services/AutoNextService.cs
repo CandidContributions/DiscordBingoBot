@@ -8,6 +8,8 @@ using BingoCore.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBingoBot.Extensions;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace DiscordBingoBot.Services
 {
@@ -16,9 +18,9 @@ namespace DiscordBingoBot.Services
         private readonly IBingoService _bingoService;
         private readonly IConfigurationService _configurationService;
         private readonly ILogger _logger;
-        private SocketCommandContext _context;
         private Random _random = new Random();
-        public bool Paused { get; private set; }
+        private readonly Dictionary<string, bool> _gameIsPaused = new Dictionary<string, bool>();
+
 
         public AutoNextService(IBingoService bingoService, IConfigurationService configurationService,
             ILogger logger)
@@ -28,52 +30,106 @@ namespace DiscordBingoBot.Services
             _logger = logger;
         }
 
-        public async Task Start(object context)
+        public async Task<bool> Start(object context)
         {
             var discordContext = context as SocketCommandContext;
             if (discordContext == null)
             {
-                return;
+                return false;
             }
-            _context = discordContext;
-            Paused = false;
-            await ScheduleNext().ConfigureAwait(false);
+
+            var gameIdentifier = discordContext.GetChannelGuildIdentifier();
+            if (_gameIsPaused.ContainsKey(gameIdentifier) == false)
+            {
+                _gameIsPaused.Add(gameIdentifier,false);
+            }
+            await ScheduleNext(discordContext).ConfigureAwait(false);
+            return true;
         }
 
-        public void Pause()
+        public bool IsPaused(object context)
         {
-            Paused = true;
+            var discordContext = context as SocketCommandContext;
+            if (discordContext == null)
+            {
+                return false;
+            }
+
+            var gameIdentifier = discordContext.GetChannelGuildIdentifier();
+            if (_gameIsPaused.ContainsKey(gameIdentifier) == false)
+            {
+                return false;
+            }
+
+            return _gameIsPaused[gameIdentifier];
         }
 
-        private async Task ExecuteNext()
+        public bool Pause(object context)
         {
+            var discordContext = context as SocketCommandContext;
+            if (discordContext == null)
+            {
+                return false;
+            }
+            var gameIdentifier = discordContext.GetChannelGuildIdentifier();
+            if (_gameIsPaused.ContainsKey(gameIdentifier) == false)
+            {
+                return false;
+            }
+
+            _gameIsPaused[gameIdentifier] = true;
+            return true;
+        }
+
+        public bool Stop(object context)
+        {
+            var discordContext = context as SocketCommandContext;
+            if (discordContext == null)
+            {
+                return false;
+            }
+            var gameIdentifier = discordContext.GetChannelGuildIdentifier();
+            if (_gameIsPaused.ContainsKey(gameIdentifier) == false)
+            {
+                return false;
+            }
+
+            _gameIsPaused.Remove(gameIdentifier);
+            return true;
+        }
+
+        private async Task ExecuteNext(SocketCommandContext context)
+        {
+            var gameIdentifier = context.GetChannelGuildIdentifier();
             // check if we are not paused
-            if (Paused)
+            if (_gameIsPaused.ContainsKey(gameIdentifier) == false || _gameIsPaused[gameIdentifier])
             {
                 return;
             }
 
-            var next = await _bingoService.NextItem().ConfigureAwait(false);
+            var bingoGame = _bingoService.GetGame(context.GetChannelGuildIdentifier());
+
+            var next = await bingoGame.NextItem().ConfigureAwait(false);
             if (next.Result)
             {
                 var reply = string.Format(await _configurationService.GetPhrase(PhraseKeys.Next.Success).ConfigureAwait(false), next.Info);
-                    await _context.Message.Channel.SendMessageAsync(reply);
+                    await context.Message.Channel.SendMessageAsync(reply);
                 // queue the next
-                await ScheduleNext().ConfigureAwait(false);
+                await ScheduleNext(context).ConfigureAwait(false);
             }
             else
             {
-                await _context.User.SendMessageAsync("Can't call a new item: " + next.Info);
+                await context.User.SendMessageAsync("Can't call a new item: " + next.Info);
             }
         }
 
-        private async Task ScheduleNext()
+        private async Task ScheduleNext(SocketCommandContext context)
         {
             var config = await _configurationService.GetConfiguration().ConfigureAwait(true);
 
 #pragma warning disable 4014
             // No need to await, as it will run on another thread anyway and we want the scheduling to return asap
-            Task.Delay(CalculateDelay(config.AutoRoundSettings) * 1000).ContinueWith(t => ExecuteNext());
+            Task.Delay(CalculateDelay(config.AutoRoundSettings) * 1000).ContinueWith(t => ExecuteNext(context));
 #pragma warning restore 4014
         }
 

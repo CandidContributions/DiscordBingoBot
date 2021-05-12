@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -37,8 +38,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
 
             var message = Context.Message;
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
 
-            var result = await _bingoService.Start().ConfigureAwait(false);
+            var result = await bingoGame.Start().ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync("Bingo game started by " + Context.User.Mention);

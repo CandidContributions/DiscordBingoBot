@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -29,7 +30,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = await _bingoService.CheckBingo(Context.User.Mention).ConfigureAwait(false);
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            var result = await bingoGame.CheckBingo(Context.User.Mention).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " is a winner!");

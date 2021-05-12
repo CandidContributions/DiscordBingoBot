@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using BingoCore.Services;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -22,7 +23,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
         {
             var message = Context.Message;
 
-            var result = await _bingoService.DeRegister(Context.User.Mention).ConfigureAwait(false);
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
+            var result = await bingoGame.DeRegister(Context.User.Mention).ConfigureAwait(false);
             if (result.Result)
             {
                 await ReplyAsync(Context.User.Mention + " has left the Bingo game");

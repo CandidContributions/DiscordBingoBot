@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -31,8 +32,9 @@ namespace DiscordBingoBot.Commands.BingoCommands
             }
 
             var message = Context.Message;
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
 
-            var players = _bingoService.Players;
+            var players = bingoGame.Players;
             var builder = new EmbedBuilder
             {
                 Color = new Color(114, 137, 218)

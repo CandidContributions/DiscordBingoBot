@@ -3,6 +3,7 @@ using BingoCore.Constants;
 using BingoCore.Services;
 using Discord;
 using Discord.Commands;
+using DiscordBingoBot.Extensions;
 using DiscordBingoBot.Services;
 
 namespace DiscordBingoBot.Commands.BingoCommands
@@ -32,13 +33,15 @@ namespace DiscordBingoBot.Commands.BingoCommands
                 return;
             }
 
+            var bingoGame = _bingoService.GetGame(Context.GetChannelGuildIdentifier());
+
             var message = Context.Message;
 
-            var next = await _bingoService.NextItem().ConfigureAwait(false);
+            var next = await bingoGame.NextItem().ConfigureAwait(false);
             if (next.Result)
             {
                 var reply = string.Format(await _configurationService.GetPhrase(PhraseKeys.Next.Success).ConfigureAwait(false), next.Info);
-                if (_bingoService.Verbose)
+                if (bingoGame.Verbose)
                 {
                     await ReplyAsync(reply);
                 }
