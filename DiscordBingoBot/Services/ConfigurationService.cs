@@ -90,7 +90,6 @@ namespace DiscordBingoBot.Services
                 await GetConfiguration().ConfigureAwait(false);
             }
 
-            //todo need to implement boosting 
             var phraseList = _configuration?.KeyedPhrases.FirstOrDefault(p => p.Key == key) ??
                              FallBackPhrases.FirstOrDefault(p => p.Key == key);
             if (phraseList == null)
@@ -98,7 +97,26 @@ namespace DiscordBingoBot.Services
                 return "Phrase not found = " + key;
             }
 
-            return phraseList.Phrases[_random.Next(0, phraseList.Phrases.Count)].Text;
+            var boostCount = phraseList.Phrases.Sum(p => p.Boost);
+            if (boostCount == 0)
+            {
+                return phraseList.Phrases[_random.Next(0, phraseList.Phrases.Count)].Text;
+            }
+
+            var targetWeightIndex = _random.Next(0, phraseList.Phrases.Count + boostCount);
+
+            var processedWeight = 0;
+            for (var i = 0; i < phraseList.Phrases.Count; i++)
+            {
+                if (processedWeight + i + phraseList.Phrases[i].Boost >= targetWeightIndex)
+                {
+                    return phraseList.Phrases[i].Text;
+                }
+
+                processedWeight += i + phraseList.Phrases[i].Boost;
+            }
+
+            return phraseList.Phrases.Last().Text;
         }
 
         private static readonly List<KeyedPhrases> FallBackPhrases = new List<KeyedPhrases>
