@@ -17,23 +17,25 @@ namespace DiscordBingoBot.Services
             _configuration = configuration;
         }
 
-        public bool HasBingoManagementPermissions(SocketCommandContext context)
+        public bool HasBingoManagementPermissions(object context)
         {
+            var discordContext = context as SocketCommandContext;
+
             if (context == null)
             {
                 return false;
             }
 
-            var guildUser = context.Guild.GetUser(context.User.Id);
+            var guildUser = discordContext.Guild.GetUser(discordContext.User.Id);
             var roles = _configuration["BingoManagementRoles"].Split(',');
             if (guildUser.Roles.Any(role => roles.Any(roleName => roleName == role.Name)))
             {
                 return true;
             }
 
-            context.Message.DeleteAsync();
+            discordContext.Message.DeleteAsync();
             guildUser.SendMessageAsync("You do not have permissions to execute this command (" +
-                                       context.Message.Content + ")");
+                                       discordContext.Message.Content + ")");
             return false;
         }
     }

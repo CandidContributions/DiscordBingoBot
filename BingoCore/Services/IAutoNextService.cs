@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Discord.Commands;
 
 namespace DiscordBingoBot.Services
 {
     public interface IAutoNextService
     {
         bool Paused { get; }
-        Task Start(SocketCommandContext context);
+        Task Start(object context);
         void Pause();
     }
 }

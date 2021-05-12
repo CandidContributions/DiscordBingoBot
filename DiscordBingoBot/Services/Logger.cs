@@ -10,7 +10,12 @@ namespace DiscordBingoBot.Services
     {
         public Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            return Log(msg.ToString());
+        }
+
+        public Task Log(string msg)
+        {
+            Console.WriteLine(msg);
             return Task.CompletedTask;
         }
 

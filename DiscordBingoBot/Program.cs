@@ -18,7 +18,7 @@ namespace DiscordBingoBot
         private IConfigurationRoot _config;
         private CommandHandler _commandHandler;
         private CommandService _commandService;
-        private ILogger _logger;
+        private Logger _logger;
 
 
         public static void Main(string[] args)

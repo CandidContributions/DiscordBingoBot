@@ -27,9 +27,14 @@ namespace DiscordBingoBot.Services
             _logger = logger;
         }
 
-        public async Task Start(SocketCommandContext context)
+        public async Task Start(object context)
         {
-            _context = context;
+            var discordContext = context as SocketCommandContext;
+            if (discordContext == null)
+            {
+                return;
+            }
+            _context = discordContext;
             Paused = false;
             await ScheduleNext().ConfigureAwait(false);
         }
