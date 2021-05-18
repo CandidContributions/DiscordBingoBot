@@ -1,4 +1,4 @@
-﻿namespace BingoCore.Services
+﻿namespace DiscordBingoBot.Services
 {
     public interface IPermissionHandler
     {

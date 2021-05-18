@@ -26,7 +26,7 @@ namespace BingoCore.Services
             _configurationService = configurationService;
         }
 
-        private List<Player> _players;
+        private List<Player> _players = new();
         private List<string> _roundItems;
         private List<IWinCondition> _winConditions = new List<IWinCondition> { new OneRowWinCondition(), new FullCardWinCondition() };
         private BingoConfiguration _configuration;
@@ -36,6 +36,7 @@ namespace BingoCore.Services
         public bool Verbose { get; private set; }
         public bool IsActive { get; private set; }
         public bool IsRoundActive { get; private set; }
+        public bool IsJoinable => IsActive && IsRoundActive == false;
 
         public async Task<Outcome<string>> Start()
         {
